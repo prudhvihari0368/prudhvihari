@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=100%">
+	<link rel="icon" href="assets/favicon.png" type="image/x-icon">
+	<link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
+	<link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+	<!--<link rel="stylesheet" href="styles.css" />-->
+	<!--<link rel="stylesheet" href="responsiveStyles.css" />-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+	<title>Seat Selection</title>
+	<style>
+		/* Samsung Galaxy Z Fold */
+
+		body {
+			font-family: Poppins, sans-serif;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 0;
+			padding: 0;
+			scroll-behavior: smooth;
+			/* overflow: hidden; */
+		}
+
+		#overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.3);
+			/* Semi-transparent black background */
+			color: white;
+			justify-content: center;
+			align-items: center;
+			z-index: 9;
+		}
+
+		#circle-container {
+			position: relative;
+			width: 70px;
+			/* Adjust the size of the circle */
+			height: 70px;
+			/* Adjust the size of the circle */
+			border-radius: 50%;
+			background-color: rgba(255,
+					255,
+					255,
+					0.5);
+			/* Semi-transparent white background */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 3px solid white;
+			font-weight: bold;
+		}
+
+		.scroll-arrow {
+			font-size: 3.5em;
+			position: absolute;
+			transform-origin: 50% 100%;
+			cursor: pointer;
+		}
+
+		#up {
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%) translateY(-100%);
+		}
+
+		#down {
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%) translateY(100%);
+		}
+
+		#left {
+			left: 0;
+			top: 50%;
+			transform: translateX(-100%) translateY(-50%);
+		}
+
+		#right {
+			right: 0;
+			top: 50%;
+			transform: translateX(100%) translateY(-50%);
+		}
+
+		.seat-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: auto;
+			margin-left: 30px;
+			margin-bottom: 18%;
+		}
+
+		.row {
+			display: flex;
+			align-items: center;
+			flex-direction: row;
+		}
+
+		.seat {
+			width: 24px;
+			height: 24px;
+			margin: 5px;
+			display: inline-block;
+			text-align: center;
+			line-height: 24px;
+			cursor: pointer;
+			color: black;
+			transition: background-color 0.3s ease;
+		}
+
+		.seat:not(.disabled):not(.selected):hover {
+			background-color: #ffff00;
+		}
+
+		.seat.disabled {
+			cursor: not-allowed;
+		}
+
+		.disabled {
+			background-color: #ddd;
+			cursor: not-allowed;
+		}
+
+		.selected {
+			cursor: pointer;
+		}
+
+		.row-label {
+			margin-top: 9px;
+			margin-right: 5px;
+			font-weight: bold;
+			min-width: 30px;
+			position: sticky;
+			left: 10px;
+			font-size: 20px;
+			align-self: flex-start;
+			background-color: rgba(229, 229, 229, 0.5);
+			text-align: center;
+		}
+
+		.row-label.right {
+			margin-top: 9px;
+			margin-left: 5px;
+			margin-right: 0;
+			position: sticky;
+			right: 10px;
+		}
+
+		.fixedBox {
+			width: 100%;
+			position: fixed;
+			bottom: 0;
+			left: 50%;
+			transform: translate(-50%);
+			margin: auto;
+			background-color: white;
+		}
+
+		#selectedCount {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			font-weight: bold;
+			z-index: 2;
+			margin-bottom: 0;
+			margin: auto;
+			background-color: white;
+		}
+
+		.diamond {
+			color: #00ced1;
+			border: 2px solid #00ced1;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 5px;
+		}
+
+		.diamond:focus {
+			color: white;
+		}
+
+		.platinum {
+			color: #c0c0c0;
+			border: 2px solid #c0c0c0;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 5px;
+		}
+
+		.gold {
+			color: #ffd700;
+			border: 2px solid #ffd700;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 5px;
+		}
+
+		.bronze {
+			color: #cd7f32;
+			border: 2px solid #cd7f32;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 5px;
+		}
+
+		.diamond1,
+		.diamond2 {
+			/* Green */
+			color: #2b2b2b;
+			border: 2px solid #00ced1;
+			border-radius: 5px;
+			padding: 5px;
+			margin-left: 10px;
+			margin-right: 10px;
+		}
+
+		.platinum1,
+		.platinum2 {
+			/* Blue */
+			color: #2b2b2b;
+			border: 2px solid #c0c0c0;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 10px;
+		}
+
+		.gold1,
+		.gold2 {
+			/* Gold */
+			color: #2b2b2b;
+			border: 2px solid #ffd700;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 10px;
+		}
+
+		.bronze1,
+		.bronze2 {
+			/* Bronze */
+			color: #2b2b2b;
+			border: 2px solid #cd7f32;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 10px;
+		}
+
+		.booked1 {
+			background-color: #ddd;
+			color: white;
+			border: 2px solid #ffffff;
+			border-radius: 5px;
+			padding: 5px;
+			width: max-content;
+			align-items: center;
+		}
+
+		.totaldiv {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			position: relative;
+			margin: auto;
+			padding-bottom: 20px;
+		}
+
+		.totaldiv #stage {
+			height: 20%;
+			bottom: 0px;
+			color: white;
+			background-color: #2b2b2b;
+			font-size: 20px;
+			font-weight: 200;
+			padding: 10px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: 0;
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+			width: 65%;
+			margin: auto;
+			margin-bottom: 12px;
+		}
+
+		.category-block {
+			display: flex;
+			flex-direction: row;
+			margin-top: 10px;
+		}
+
+		.seat.selected {
+			color: white;
+			background-color: #4caf50;
+		}
+
+		/* Today modification 16/01/2024*/
+		#scrollButton {
+			position: fixed;
+			right: 2%;
+			bottom: 8%;
+			background-color: #4caf50;
+			color: white;
+			border: none;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			font-size: 18px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+			z-index: 10;
+		}
+
+		#scrollButton:hover {
+			background-color: #45a049;
+			transform: scale(1.1);
+		}
+
+		.custom-alert {
+			width: 100%;
+			height: auto;
+		}
+
+		.submit {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin: 8px 0 10px 0;
+		}
+
+		.submit button {
+			background-color: GREEN;
+			color: white;
+			border: none;
+			border-radius: 20px;
+			padding: 10px 20px;
+			width: 16%;
+		}
+
+		.selectionbox {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+		}
+
+		/* table styling */
+		table {
+			border-collapse: collapse;
+			margin-top: 20px;
+			text-align: center;
+			margin: auto;
+			width: 500px;
+			/* width: 100%; */
+		}
+
+		th,
+		td {
+			border: 1px solid rgb(209, 199, 199);
+			padding: 8px;
+			width: max-content;
+			font-size: 20px;
+		}
+
+		th {
+			background-color: #e7dede;
+			font-weight: 600;
+		}
+
+		table td:nth-child(4) {
+			width: 120px;
+		}
+
+		.seatSelect {
+			width: 30%;
+		}
+
+		#editKidsCount {
+			/*added on 01-02-2024*/
+			text-decoration: none;
+		}
+
+		#proceedButton {
+			background-color: #4caf50;
+			/* Green */
+			color: white;
+			border: none;
+			padding: 12px 20px;
+			width: max-content;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+			border-radius: 20px;
+		}
+
+		#proceedButton:hover {
+			background-color: #45a049;
+			/* Darker Green */
+		}
+
+		#proceedButton:active {
+			background-color: #3e8e41;
+			/* Even Darker Green */
+		}
+
+		#proceedButton:disabled {
+			background-color: #dddddd;
+			/* Light Gray */
+			color: #666666;
+			/* Dark Gray */
+			cursor: not-allowed;
+		}
+
+		.category-block {
+			position: fixed;
+			background: rgb(0, 0, 0, 0.5);
+			left: 50%;
+			transform: translate(-50%);
+			padding: 10px 20px;
+			border-radius: 10px;
+			align-items: center;
+			font-size: 13px;
+		}
+
+		@media only screen and (min-width: 280px) and (max-width: 426px) {
+			.seat-container {
+				margin-left: 15px;
+			}
+
+			.row-label {
+				left: 8px;
+				font-size: 16px;
+				position: sticky;
+			}
+
+			.seat {
+				width: 20px;
+				height: 20px;
+				margin: 4px;
+				line-height: 20px;
+			}
+
+			#selectedCount {
+				font-size: 14px;
+			}
+
+			.category-block {
+				flex-direction: row;
+				display: none;
+			}
+
+			.category-block>div {
+				margin-bottom: 5px;
+			}
+
+			table {
+				width: 380px;
+			}
+
+			.cost_table_div {
+				overflow-x: auto;
+			}
+
+			table th:nth-child(1),
+			table td:nth-child(1) {
+				display: none;
+			}
+
+			table th:nth-child(2),
+			table td:nth-child(2),
+			table th:nth-child(3),
+			table td:nth-child(3) {
+				width: 80px;
+			}
+
+			th,
+			td {
+				font-size: 1rem;
+				max-width: max-content;
+			}
+
+			table td:nth-child(4) {
+				width: 170px;
+			}
+
+			.totaldiv #stage {
+				font-size: 15px;
+				font-weight: 900;
+				width: auto;
+				margin: auto;
+				margin-bottom: 12px;
+			}
+
+			.category-block {
+				padding: 5px;
+				font-size: 10px;
+				width: 100%;
+			}
+		}
+
+		/* mobile */
+		@media only screen and (min-width: 427) and (max-width: 576px) {
+			.seat-container {
+				margin-left: 10px;
+				margin-right: 10px;
+			}
+
+			.totaldiv #stage {
+				font-size: 15px;
+				font-weight: 900;
+				width: auto;
+				margin: auto;
+				margin-bottom: 12px;
+			}
+
+			.row-label {
+				left: 5px;
+				font-size: 16px;
+				position: sticky;
+				background-color: rgba(229, 229, 229, 0.5);
+			}
+
+			.row-label.right {
+				margin-left: 5px;
+				margin-right: 0;
+				position: sticky;
+				right: 10px;
+			}
+
+			.seat {
+				width: 18px;
+				height: 18px;
+				margin: 3px;
+				line-height: 18px;
+				font-size: 12px;
+			}
+
+			#selectedCount {
+				font-size: 14px;
+				margin-top: 10px;
+			}
+
+			.category-block>div {
+				margin-bottom: 5px;
+			}
+
+			.diamond,
+			.platinum,
+			.gold,
+			.bronze,
+			.diamond1,
+			.platinum1,
+			.gold1,
+			.bronze1,
+			.booked1 {
+				margin-bottom: 5px;
+			}
+
+			#scrollButton {
+				position: fixed;
+				right: 12%;
+				bottom: 9%;
+				width: 30px;
+				height: 30px;
+				font-size: 18px;
+				padding-bottom: 5px;
+			}
+
+			.totaldiv #stage {
+				width: 95%;
+			}
+
+			th,
+			td {
+				font-size: 10px;
+			}
+
+			table {
+				width: 700px;
+			}
+		}
+
+		/* Tablets */
+		@media only screen and (min-width: 577px) and (max-width: 768px) {
+			.seat-container {
+				margin-left: 20px;
+				margin-bottom: 16.5%;
+			}
+
+			.row-label {
+				left: 10px;
+				font-size: 18px;
+				position: sticky;
+			}
+
+			.seat {
+				width: 22px;
+				height: 22px;
+				margin: 4px;
+				line-height: 22px;
+			}
+
+			#selectedCount {
+				font-size: 16px;
+			}
+
+			.category-block {
+				flex-direction: row;
+			}
+
+			.category-block>div {
+				margin-right: 10px;
+			}
+
+			#selectedCount {
+				font-size: 18px;
+			}
+
+			#scrollButton {
+				position: fixed;
+				right: 12%;
+				bottom: 9%;
+				height: 38px;
+				width: 38px;
+				font-size: 25px;
+				padding-bottom: 1rem;
+			}
+
+			th,
+			td {
+				font-size: 18px;
+			}
+
+			table {
+				width: 700px;
+			}
+
+			table td:nth-child(4) {
+				width: 180px;
+			}
+		}
+
+		/* Desktops */
+		@media only screen and (min-width: 769px) and (max-width: 992px) {
+
+			th,
+			td {
+				font-size: 18px;
+			}
+
+			table {
+				max-width: 700px;
+			}
+
+			table td:nth-child(4) {
+				width: 180px;
+			}
+		}
+
+		@media only screen and (min-width: 992px) and (max-width: 1200px) {
+			table {
+				width: 700px;
+			}
+
+			table td:nth-child(4) {
+				width: 200px;
+			}
+
+			.category-block {
+				font-size: 16px;
+			}
+		}
+
+		@media only screen and (min-width: 1200px) and (max-width: 3000px) {
+			table {
+				width: 800px;
+				max-width: fit-content;
+				font-size: 28px;
+			}
+
+			table td:nth-child(4) {
+				width: 220px;
+			}
+
+			.category-block {
+				font-size: 17px;
+			}
+		}
+
+		@media only screen and (min-width: 3000px) and (max-width: 6000px) {
+			table {
+				font-size: 30px;
+			}
+
+			table td:nth-child(4) {
+				width: 220px;
+			}
+
+			.category-block {
+				font-size: 23px;
+			}
+		}
+
+		/* Add CSS styles for the loader */
+		.loader {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			z-index: 9999;
+		}
+
+		.loader-content {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: white;
+			text-align: center;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			/* Center horizontally */
+		}
+
+		.loader-spinner {
+			border: 4px solid rgba(255, 255, 255, 0.3);
+			border-radius: 50%;
+			border-top: 4px solid #fff;
+			width: 40px;
+			height: 40px;
+			animation: spin 2s linear infinite;
+			margin-bottom: 10px;
+		}
+
+		.loader-text {
+			font-size: 16px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="overlay">
+		<div id="circle-container">
+			<div class="scroll-arrow" id="up">&#8593;</div>
+			<div class="scroll-arrow" id="down">&#8595;</div>
+			<div class="scroll-arrow" id="left">&#8592;</div>
+			<div class="scroll-arrow" id="right">&#8594;</div>
+			<span style="color: white; font-weight: bold;font-size: 12px;">Scrollable</span>
+		</div>
+	</div>
+	<div class="totaldiv">
+		<div class="category-block">
+			<div class="diamond1">Diamond</div>
+			<div class="platinum1">Platinum</div>
+			<div class="gold1">Gold</div>
+			<div class="bronze1">Bronze</div>
+			<div class="booked1">Not Allowed for Booking</div>
+		</div>
+		<div class="seat-container" id="seatContainer"></div>
+		<div class="fixedBox">
+			<div id="stage">Stage - All eyes this way please!</div>
+			<input type="hidden" id="aCnt" value="" />
+			<input type="hidden" id="cCnt" value="" />
+			<!-- <p id="selectedCount"></p> -->
+			<div class="cost_table_div">
+				<table>
+					<thead>
+						<tr id="tableHeaderRow"></tr>
+					</thead>
+					<tbody id="selectedSeatsTableBody"></tbody>
+				</table>
+			</div>
+
+			<div class="submit">
+				<button id="proceedButton" type="submit" disabled>
+					Select your seats to proceed
+				</button>
+			</div>
+		</div>
+	</div>
+	<!-- Loader HTML -->
+	<div id="loader" class="loader">
+		<div class="loader-content">
+			<div class="loader-spinner"></div>
+			<p>Do not refresh, redirecting to Payment Gateway</p>
+		</div>
+	</div>
+
+	<script>
+		// Function to show the loader
+		function showLoader() {
+			const loader = document.getElementById('loader');
+			loader.style.display = 'block';
+		}
+
+		// Function to hide the loader
+		function hideLoader() {
+			const loader = document.getElementById('loader');
+			loader.style.display = 'none';
+		}
+
+		function showKidsCountPopup() {
+			let savedAdults = 0;
+			let savedKids = 0;
+
+			const showPopup = () => {
+				Swal.fire({
+					title: 'Number of Kids',
+					confirmButtonText: 'Confirm',
+					closeOnConfirm: true,
+					html: `
+                <style>
+                    .custom-title-class {  
+    		        font-size: 20px !important;
+    		        color: #4e4a4a;
+    	            }
+    
+                    .input-group {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-left: 20px;
+                    }
+    
+                    .btn-decrement,
+                    .btn-increment,
+                    input {
+                        border: none;
+                        font-size: 24px;
+                        width: 50px;
+                        height: 50px;
+                        text-align: center;
+                        margin: 3px;
+                        font-weight: bold;
+                    }
+    
+                    .btn-decrement,
+                    .btn-increment {
+                        cursor: pointer;
+                        margin: 0;
+                        border-radius: 50%;
+                    }
+    
+                    .selectdiv,
+                    .category-block-1 {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-top : 10px;
+                    }
+                    .diamond2,
+                    .platinum2,
+                    .gold2,
+                    .bronze2 {
+                        font-weight: bold;
+                        font-size: 16px;
+                        width : 80px
+                    }
+    
+                    .note1 {
+                        color: #4285f4;
+                        font-size : 16px;
+                        font-weight : bold;
+                        margin : 10px;
+                    }
+    
+                    .selectdiv label b{
+                        color : #4e4a4a;
+                        
+                    }
+    
+                    .custom-popup-class {
+                    border-radius : 20px;   
+                    }
+    
+                    .swal2-confirm.custom-ok-button-class {
+                        background-color: green; 
+                        color: white;
+                        border-radius : 20px;
+                        border : none;
+                        box-shadow: none !important;
+                        width : 160px;
+                    } 
+    
+                    @media only screen  and  (max-width: 360px) {
+                        .input-group {
+                            margin-left: 10px;
+                        }
+    
+                        .btn-decrement,
+                        .btn-increment,
+                        input {
+                            border: none;
+                            font-size: 24px;
+                            width: 40px;
+                            height: 40px;
+                            margin: 3px;
+                            padding: 0;
+                        }
+    
+                        .diamond2,
+                        .platinum2,
+                        .gold2,
+                        .bronze2 {
+                            font-size : 14px;
+                            margin-left: 3px;
+                            margin-right: 3px;
+                            padding : 2px;
+                        }
+                        .selectdiv{
+                           width : max-content;
+                            margin: 0;
+                            position : relative;
+                            right : -15px;
+                        }
+                    }
+                    @media only screen and  (max-width: 300px) {
+                        .selectdiv{
+                            position : relative;
+                            right : 25px;
+                        }
+                    }
+    
+                </style>
+                <div >
+                    <div class="custom-popup-container" >
+                    <div>
+                    <div >
+    
+                        <div class="selectdiv">
+                            <label for="kids"> &nbsp; &nbsp;<b> Kids :</b></label>
+                            <div class="input-group">
+                                <button class="btn-decrement" data-target="kids">-</button>
+                                <input type="text" id="kids" min="0" max="15" required value="${savedKids}" readonly>
+                                <button class="btn-increment" data-target="kids">+</button>
+                            </div>
+                        </div>
+    
+                        <div class="category-block-1">
+                            <div id="diamond2" class="diamond2"></div>
+                            <div id="platinum2" class="platinum2"></div>
+                            <div id="gold2" class="gold2"></div>
+                            <div id="bronze2" class="bronze2"></div>
+                        </div>
+                        
+                        <div class="note" style="text-align:center;font-size:0.8rem">
+                            <p>Note: Kid(s) must be accompanied by atleast one Adult.</p>
+                        </div>
+                    
+                    </div>
+                </div>
+            `,
+					customClass: {
+						popup: 'custom-popup-class',
+						title: 'custom-title-class',
+						confirmButton: 'custom-ok-button-class',
+					},
+				}).then((result) => {
+					if (result.isConfirmed) {
+
+						console.log(result.value);
+						toggleOverlayVisibility();
+						updateSelectedSeatsTable();/*added on 01-02-2024*/
+					} else {
+						showPopup();
+					}
+				});
+
+				const updateCategoryCost = () => {
+					const kidsValue = parseInt(document.getElementById('kids').value);
+
+					const costPerSeatDiamond = 89;
+					const costPerSeatPlatinum = 25;
+					const costPerSeatGold = 25;
+					const costPerSeatBronze = 25;
+
+					const diamondSeats = 15;
+					const platinumSeats = 15;
+					const goldSeats = 15;
+					const bronzeSeats = 15;
+
+					const totalSeats = kidsValue;
+
+					const diamondCost = Math.min(totalSeats, diamondSeats) * costPerSeatDiamond;
+					const platinumCost = Math.min(totalSeats, platinumSeats) * costPerSeatPlatinum - (kidsValue * 25);
+					const goldCost = Math.min(totalSeats, goldSeats) * costPerSeatGold - (kidsValue * 25);
+					const bronzeCost = Math.min(totalSeats, bronzeSeats) * costPerSeatBronze - (kidsValue * 25);
+
+					document.getElementById('diamond2').innerHTML = `Diamond <br> $${costPerSeatDiamond}`;
+					document.getElementById('platinum2').innerHTML = `Platinum <br> $${costPerSeatPlatinum}`;
+					document.getElementById('gold2').innerHTML = ` Gold <br> $${costPerSeatGold}`;
+					document.getElementById('bronze2').innerHTML = `Bronze <br> $${costPerSeatBronze}`;
+				};
+
+				const updateButtonColors = () => {
+					const kidsValue = document.getElementById('kids').value;
+					const sum = parseInt(kidsValue);
+
+					document.getElementById('cCnt').value = kidsValue;
+
+					document.querySelectorAll('.btn-decrement').forEach(button => {
+						button.style.backgroundColor = kidsValue === '0' ? '#c0c0c0' : '#e57373';
+					});
+
+					document.querySelectorAll('.btn-increment').forEach(button => {
+						button.style.backgroundColor = (kidsValue === '14' || sum === 14) ? '#c0c0c0' : '#87d37c';
+					});
+
+
+					updateCategoryCost();
+				};
+
+				const decrement = (field) => {
+					const inputElement = document.getElementById(field);
+
+					inputElement.value = Math.max(parseInt(inputElement.value) - 1, 0);
+
+					updateButtonColors();
+				};
+
+				const increment = (field) => {
+					const inputElement = document.getElementById(field);
+					
+					const sum = parseInt(inputElement.value);
+
+					if (sum < 14) {
+						inputElement.value = Math.min(parseInt(inputElement.value) + 1, 14);
+					}
+
+					updateButtonColors();
+				};
+
+				// Event listeners for increment and decrement buttons
+				document.querySelectorAll('.btn-decrement').forEach(button => {
+					button.addEventListener('click', (event) => {
+						const targetId = event.target.dataset.target;
+						decrement(targetId);
+					});
+				});
+
+				document.querySelectorAll('.btn-increment').forEach(button => {
+					button.addEventListener('click', (event) => {
+						const targetId = event.target.dataset.target;
+						increment(targetId);
+					});
+				});
+
+				// Initial button color update
+				updateButtonColors();
+			};
+			
+			// Call the function to show the popup
+			showPopup();
+
+		}
+		/*added on 01-02-2024*/
+		function updateSelectedSeatsTable() {
+			const tableBody = document.getElementById("selectedSeatsTableBody");
+			const tableHeaderRow = document.getElementById("tableHeaderRow");
+			const proceedButton = document.getElementById("proceedButton");
+
+			tableHeaderRow.style.display = "";
+			tableBody.innerHTML = "";
+
+			let totalCost = 0;
+			let serialNumber = 1;
+			let seatCount = 0;
+
+			const dynamicColumns = [
+				"S.No.",
+				"Description",
+			];
+
+			tableHeaderRow.innerHTML = "";
+
+			dynamicColumns.forEach((columnText) => {
+				const th = document.createElement("th");
+				th.textContent = columnText;
+				tableHeaderRow.appendChild(th);
+			});
+
+			// Dynamically add a row for the number of kids seats
+			const kidsRow = document.createElement("tr");
+			kidsRow.innerHTML = `
+        <td>${serialNumber}</td>
+		<td>number of kids seats - ${parseInt(document.getElementById('cCnt').value)} <a href="#" id="editKidsCount"> Change Count</a></td>
+    `;
+
+			tableBody.appendChild(kidsRow);
+			document.getElementById('editKidsCount').addEventListener("click", function () {
+				showKidsCountPopup();
+			});
+
+			proceedButton.textContent = `Select your seats to proceed`;
+
+			proceedButton.disabled = selectedSeatsCount === 0 || selectedSeatsCount > maxSeatsAllowed || selectedSeatsCount <= parseInt(document.getElementById('cCnt').value);
+		}
+		/*upto here on 01-02-2024*/
+
+		document.addEventListener("DOMContentLoaded", function () {
+			showKidsCountPopup();
+
+			const totalSelectable = parseInt(document.getElementById('aCnt').value) + parseInt(document.getElementById('cCnt').value);
+			const maxSeatsAllowed = 15;
+			let selectedSeatsCount = 0;
+
+			var overlay = document.getElementById("overlay");
+
+			overlay.style.display = "flex";
+			setTimeout(function () {
+				overlay.style.display = "none";
+			}, 5000);
+
+			const rows = 23;
+			const seatsPerRow = {
+				W: 8,
+				V: 8,
+				U: 18,
+				T: 18,
+				S: 34,
+				R: 32,
+				Q: 34,
+				P: 32,
+				O: 32,
+				N: 32,
+				M: 32,
+				L: 28,
+				K: 30,
+				J: 28,
+				I: 28,
+				H: 26,
+				G: 26,
+				F: 26,
+				E: 26,
+				D: 26,
+				C: 26,
+				B: 26,
+				A: 18,
+			};
+
+			const hiddenSeats = [
+				{ row: "A", seat: 2 },
+				{ row: "A", seat: 3 },
+				{ row: "A", seat: 16 },
+				{ row: "A", seat: 17 },
+			];
+
+			const disabledRowSeats = [];
+			const spacedSeats = [
+				{ row: "W", spaces: [{ start: 4, end: 4, space: 1475 }] },
+				{ row: "V", spaces: [{ start: 4, end: 4, space: 1455 }] },
+				{ row: "U", spaces: [{ start: 4, end: 4, space: 80 }] },
+				{ row: "U", spaces: [{ start: 9, end: 9, space: 825 }] },
+				{ row: "U", spaces: [{ start: 14, end: 14, space: 80 }] },
+				{ row: "T", spaces: [{ start: 4, end: 4, space: 80 }] },
+				{ row: "T", spaces: [{ start: 9, end: 9, space: 800 }] },
+				{ row: "T", spaces: [{ start: 14, end: 14, space: 80 }] },
+				{ row: "S", spaces: [{ start: 4, end: 4, space: 90 }] },
+				{ row: "S", spaces: [{ start: 17, end: 17, space: 30 }] },
+				{ row: "S", spaces: [{ start: 30, end: 30, space: 90 }] },
+				{ row: "R", spaces: [{ start: 3, end: 3, space: 80 }] },
+				{ row: "R", spaces: [{ start: 16, end: 16, space: 30 }] },
+				{ row: "R", spaces: [{ start: 29, end: 29, space: 80 }] },
+				{ row: "Q", spaces: [{ start: 4, end: 4, space: 70 }] },
+				{ row: "Q", spaces: [{ start: 17, end: 17, space: 30 }] },
+				{ row: "Q", spaces: [{ start: 30, end: 30, space: 70 }] },
+				{ row: "P", spaces: [{ start: 4, end: 4, space: 95 }] },
+				{ row: "P", spaces: [{ start: 16, end: 16, space: 30 }] },
+				{ row: "P", spaces: [{ start: 28, end: 28, space: 95 }] },
+				{ row: "O", spaces: [{ start: 4, end: 4, space: 85 }] },
+				{ row: "O", spaces: [{ start: 16, end: 16, space: 30 }] },
+				{ row: "O", spaces: [{ start: 28, end: 28, space: 85 }] },
+				{ row: "N", spaces: [{ start: 4, end: 4, space: 75 }] },
+				{ row: "N", spaces: [{ start: 16, end: 16, space: 30 }] },
+				{ row: "N", spaces: [{ start: 28, end: 28, space: 75 }] },
+				{ row: "M", spaces: [{ start: 4, end: 4, space: 65 }] },
+				{ row: "M", spaces: [{ start: 16, end: 16, space: 30 }] },
+				{ row: "M", spaces: [{ start: 28, end: 28, space: 65 }] },
+				{ row: "L", spaces: [{ start: 3, end: 3, space: 90 }] },
+				{ row: "L", spaces: [{ start: 14, end: 14, space: 30 }] },
+				{ row: "L", spaces: [{ start: 25, end: 25, space: 90 }] },
+				{ row: "K", spaces: [{ start: 4, end: 4, space: 80 }] },
+				{ row: "K", spaces: [{ start: 15, end: 15, space: 30 }] },
+				{ row: "K", spaces: [{ start: 26, end: 26, space: 80 }] },
+				{ row: "J", spaces: [{ start: 3, end: 3, space: 70 }] },
+				{ row: "J", spaces: [{ start: 14, end: 14, space: 30 }] },
+				{ row: "J", spaces: [{ start: 25, end: 25, space: 70 }] },
+				{ row: "I", spaces: [{ start: 3, end: 3, space: 60 }] },
+				{ row: "I", spaces: [{ start: 14, end: 14, space: 30 }] },
+				{ row: "I", spaces: [{ start: 25, end: 25, space: 60 }] },
+				{ row: "H", spaces: [{ start: 3, end: 3, space: 85 }] },
+				{ row: "H", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "H", spaces: [{ start: 23, end: 23, space: 85 }] },
+				{ row: "G", spaces: [{ start: 3, end: 3, space: 75 }] },
+				{ row: "G", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "G", spaces: [{ start: 23, end: 23, space: 75 }] },
+				{ row: "F", spaces: [{ start: 3, end: 3, space: 65 }] },
+				{ row: "F", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "F", spaces: [{ start: 23, end: 23, space: 65 }] },
+				{ row: "E", spaces: [{ start: 3, end: 3, space: 55 }] },
+				{ row: "E", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "E", spaces: [{ start: 23, end: 23, space: 55 }] },
+				{ row: "D", spaces: [{ start: 4, end: 4, space: 80 }] },
+				{ row: "D", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "D", spaces: [{ start: 22, end: 22, space: 80 }] },
+				{ row: "C", spaces: [{ start: 4, end: 4, space: 70 }] },
+				{ row: "C", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "C", spaces: [{ start: 22, end: 22, space: 70 }] },
+				{ row: "B", spaces: [{ start: 4, end: 4, space: 60 }] },
+				{ row: "B", spaces: [{ start: 13, end: 13, space: 30 }] },
+				{ row: "B", spaces: [{ start: 22, end: 22, space: 60 }] },
+				{ row: "A", spaces: [{ start: 9, end: 9, space: 30 }] },]; // Specify the rows and corresponding seats to have space
+			function toggleCategoryBackgroundColor(seatElement, category) {
+				if (seatElement.classList.contains("selected")) {
+					seatElement.style.backgroundColor = "#4caf50"; /* Green */
+				} else {
+					seatElement.style.backgroundColor = "";
+				}
+			}
+
+			function getCategoryColor(category) {
+				switch (category) {
+					case "Diamond":
+						return "#00CED1"; // Green
+					case "Platinum":
+						return "#C0C0C0"; // Blue
+					case "Gold":
+						return "#FFD700"; // Gold
+					case "Bronze":
+						return "#CD7F32"; // Bronze
+					default:
+						return "";
+				}
+			}
+
+			function getCategory(rowLabel) {
+				if (["A", "B", "C", "D"].includes(rowLabel)) {
+					return "Diamond";
+				} else if (["E", "F", "G"].includes(rowLabel)) {
+					return "Platinum";
+				} else if (["H", "I", "J"].includes(rowLabel)) {
+					return "Gold";
+				} else {
+					return "Bronze";
+				}
+			}
+
+			for (let i = 0; i < rows; i++) {
+				const specificRowSeats = { W: 500 };
+				const specificRowSpaces = { W: 50 };
+
+				const seatContainer = document.getElementById("seatContainer");
+				const selectedCountElement = document.getElementById("selectedCount");
+				const rowLabels = "WVUTSRQPONMLKJIHGFEDCBA";
+
+				const rowElement = document.createElement("div");
+				rowElement.classList.add("row");
+
+				const rowLabel = document.createElement("span");
+				rowLabel.classList.add("row-label");
+				rowLabel.textContent = rowLabels[i];
+				rowElement.appendChild(rowLabel);
+
+				seatContainer.appendChild(rowElement);
+
+				for (let j = 1; j <= seatsPerRow[rowLabels[i]]; j++) {
+					const seatElement = document.createElement("div");
+					seatElement.classList.add("seat");
+
+					const isHidden = hiddenSeats.some(
+						(seat) => seat.row === rowLabels[i] && seat.seat === j
+					);
+
+					const isDisabled = disabledRowSeats.some((disabledRow) => {
+						return (
+							disabledRow.row === rowLabels[i] &&
+							disabledRow.seats.includes(j)
+						);
+					});
+
+					const hasSpace = spacedSeats.some((spacedSeat) => {
+						if (spacedSeat.row === rowLabels[i]) {
+							const inSpacedRange = spacedSeat.spaces.some(
+								(space) => j >= space.start && j <= space.end
+							);
+							if (inSpacedRange) {
+								seatElement.style.marginRight = `${spacedSeat.spaces[0].space}px`;
+							}
+						}
+						return false;
+					});
+
+					const isSpecificRowSeat =
+						rowLabels[i] === "W" && j <= specificRowSeats.W;
+					const isSpecificRowSpace =
+						rowLabels[i] === "W" &&
+						j > specificRowSeats.W &&
+						j <= specificRowSeats.W + specificRowSpaces.W;
+
+					if (isHidden) {
+						seatElement.style.visibility = "hidden";
+					} else if (isDisabled) {
+						seatElement.classList.add("disabled");
+						seatElement.setAttribute("disabled", true);
+						seatElement.style.backgroundColor = "#ddd";
+					} else {
+						if (hasSpace) {
+							seatElement.style.marginRight = "45px";
+						}
+
+						seatElement.addEventListener("click", function () {
+							if (!seatElement.hasAttribute("disabled")) {
+								this.classList.toggle("selected");
+
+								// Toggle the category background color
+								const category = getCategory(rowLabels[i]);
+								toggleCategoryBackgroundColor(this, category);
+
+								updateSelectedCount();
+							}
+						});
+					}
+
+					// Add classes based on seat rows
+					if (["A", "B", "C", "D"].includes(rowLabels[i])) {
+						seatElement.classList.add("diamond");
+					} else if (["E", "F", "G"].includes(rowLabels[i])) {
+						seatElement.classList.add("platinum");
+					} else if (["H", "I", "J"].includes(rowLabels[i])) {
+						seatElement.classList.add("gold");
+					} else {
+						seatElement.classList.add("bronze");
+						if (["M"].includes(rowLabels[i])) {
+							seatElement.classList.add("scrollhere");
+						}
+					}
+
+					seatElement.textContent = j;
+					rowElement.appendChild(seatElement);
+				}
+				const rightRowLabel = document.createElement("span");
+				rightRowLabel.classList.add("row-label", "right");
+				rightRowLabel.textContent = rowLabels[i];
+				rowElement.appendChild(rightRowLabel);
+			}
+
+			const submitButton = document.querySelector("button[type=submit]");
+			submitButton.addEventListener("click", submitSelection);
+			const proceedButton = document.getElementById("proceedButton");
+			proceedButton.disabled = true; // Set the button to be disabled by default
+
+			const seatPrices = {
+				Diamond: 89,
+				Platinum: 79,
+				Gold: 65,
+				Bronze: 50,
+			};
+
+			function updateSelectedCount() {
+				const selectedSeats = document.querySelectorAll(".selected");
+				const selectedSeatsData = {};
+				selectedSeatsCount = selectedSeats.length;
+
+				selectedSeats.forEach((selectedSeat) => {
+					const rowLabel =
+						selectedSeat.parentElement.querySelector(
+							".row-label"
+						).textContent;
+					const seatNumber = selectedSeat.textContent;
+					const category = getCategory(rowLabel);
+
+					if (!selectedSeatsData[category]) {
+						selectedSeatsData[category] = [];
+					}
+
+					selectedSeatsData[category].push({
+						row: rowLabel,
+						seat: seatNumber,
+					});
+				});
+
+				updateSelectedSeatsTable(selectedSeatsData);
+				updateProceedButtonState();
+			}
+
+			function submitSelection() {
+				showLoader();
+				let bCnt = 0;
+				let gCnt = 0;
+				let pCnt = 0;
+				let dCnt = 0;
+				let fData = "";
+				let aCnt = document.getElementById('aCnt').value;
+				let cCnt = document.getElementById('cCnt').value;
+
+
+				const selectedSeats = document.querySelectorAll(".selected");
+				const selectedSeatsData = {};
+				let selectedSeatsLeanData = "";
+
+				selectedSeats.forEach((selectedSeat) => {
+					const rowLabel =
+						selectedSeat.parentElement.querySelector(
+							".row-label"
+						).textContent;
+					const seatNumber = selectedSeat.textContent;
+					const category = getCategory(rowLabel);
+
+					if (!selectedSeatsData[category]) {
+						selectedSeatsData[category] = [];
+					}
+
+					selectedSeatsData[category].push({
+						row: rowLabel,
+						seat: seatNumber,
+					});
+
+					selectedSeatsLeanData += rowLabel + "-" + seatNumber + ",";
+				});
+				const jsonData = JSON.stringify(selectedSeatsData, null, 2);
+
+				if (selectedSeatsData['Bronze'] && selectedSeatsData['Bronze'].length) {
+					bCnt = selectedSeatsData['Bronze'].length;
+				}
+				if (selectedSeatsData['Gold'] && selectedSeatsData['Gold'].length) {
+					gCnt = selectedSeatsData['Gold'].length;
+				}
+				if (selectedSeatsData['Platinum'] && selectedSeatsData['Platinum'].length) {
+					pCnt = selectedSeatsData['Platinum'].length;
+				}
+				if (selectedSeatsData['Diamond'] && selectedSeatsData['Diamond'].length) {
+					dCnt = selectedSeatsData['Diamond'].length;
+				}
+				fData = selectedSeatsLeanData.slice(0, -1);
+				const url = 'https://www.klubgdc.com.au/savinay/freeze_seats.php';
+
+				const params = {
+					tId: 5488,
+					bCnt: bCnt,
+					gCnt: gCnt,
+					pCnt: pCnt,
+					dCnt: dCnt,
+					cCnt: cCnt,
+					fData: fData
+				};
+
+				fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(params)
+				})
+					.then(response => response.json())
+					.then(data => {
+						console.log(data);
+						console.log("bCnt", bCnt);
+						console.log("gCnt", gCnt);
+						console.log("pCnt", pCnt);
+						console.log("dCnt", dCnt);
+						console.log("cCnt", cCnt);
+						console.log("fData", fData);
+
+						let path = "order_summary.php?tid=5488";
+
+						console.log(path);
+						window.location.href = path;
+
+					})
+					.catch(error => {
+						// Handle errors here
+						console.error('Error:', error);
+					});
+
+			}
+
+			function updateProceedButtonState() {
+				const selectedSeats = document.querySelectorAll(".selected");
+				const proceedButton = document.getElementById("proceedButton");
+				const maxSeatsAllowed = 15;
+				if (selectedSeats.length > maxSeatsAllowed) {
+					Swal.fire({
+						icon: "warning",
+						title: "Oops...",
+						text: `You can only select up to ${maxSeatsAllowed} seats.`,
+						confirmButtonColor: "#3085d6",
+						confirmButtonText: "OK",
+					});
+					const lastSelectedSeat = document.querySelector(
+						".selected:last-child"
+					);
+					if (lastSelectedSeat) {
+						lastSelectedSeat.classList.remove("selected");
+						toggleCategoryBackgroundColor(
+							lastSelectedSeat,
+							getCategory(lastSelectedSeat)
+						);
+					}
+				}
+				const allSeats = document.querySelectorAll(".seat");
+				if (selectedSeatsCount >= maxSeatsAllowed) {
+					allSeats.forEach((seat) => {
+						if (!seat.classList.contains("selected")) {
+							seat.classList.add("disabled");
+							seat.removeEventListener("click", seatClickHandler);
+						}
+					});
+				} else {
+					allSeats.forEach((seat) => {
+						seat.classList.remove("disabled");
+						seat.addEventListener("click", seatClickHandler);
+					});
+				}
+				proceedButton.disabled = selectedSeatsCount === 0 || selectedSeatsCount > maxSeatsAllowed || selectedSeatsCount <= parseInt(document.getElementById('cCnt').value);
+			}
+
+			function seatClickHandler() {
+				if (
+					!this.hasAttribute("disabled") &&
+					selectedSeatsCount > maxSeatsAllowed
+				) {
+					this.classList.toggle("selected");
+					const category = getCategory(
+						this.parentElement.querySelector(".row-label").textContent
+					);
+					toggleCategoryBackgroundColor(this, category);
+
+					updateSelectedCount();
+				}
+				const allSeats = document.querySelectorAll(".seat");
+				allSeats.forEach((seat) => {
+					seat.addEventListener("click", seatClickHandler);
+					if (seat.classList.contains("disabled")) {
+						seat.style.cursor = "not-allowed";
+					}
+				});
+			}
+
+			function updateSelectedSeatsTable(selectedSeatsData) {
+				const tableBody = document.getElementById("selectedSeatsTableBody");
+				const tableHeaderRow = document.getElementById("tableHeaderRow");
+				const proceedButton = document.getElementById("proceedButton");
+
+				tableBody.innerHTML = ""; // Clear existing rows
+
+				let totalCost = 0;
+				let serialNumber = 1;
+				let seatCount = 0;
+
+				console.log("Object.keys(selectedSeatsData).length", Object.keys(selectedSeatsData).length);
+				console.log("parseInt(document.getElementById('cCnt').value)", parseInt(document.getElementById('cCnt').value));
+				if (Object.keys(selectedSeatsData).length === 0) {
+					tableHeaderRow.style.display = "none";
+					proceedButton.textContent = "Select your seats to proceed";
+					proceedButton.disabled = true;
+					return;
+				} else {
+
+					tableHeaderRow.style.display = "";
+				}
+
+				const dynamicColumns = [
+					"S.No.",
+					"Description",
+				];
+
+				tableHeaderRow.innerHTML = "";
+
+				dynamicColumns.forEach((columnText) => {
+					const th = document.createElement("th");
+					th.textContent = columnText;
+					tableHeaderRow.appendChild(th);
+				});
+
+				for (const category in selectedSeatsData) {
+					const seats = selectedSeatsData[category];
+					const costPerSeat = seatPrices[category];
+					const categoryCost = seats.length * costPerSeat;
+					seatCount = seatCount + seats.length;
+
+					const seatNumbers = seats
+						.map((seat) => `${seat.row}-${seat.seat}`)
+						.join(", ");
+
+					const row = document.createElement("tr");
+					row.innerHTML = `
+                        <td>${serialNumber}</td>
+                        <td>${category} : ${seatNumbers}</td>
+                         `;
+
+					tableBody.appendChild(row);
+					totalCost += categoryCost;
+					serialNumber++;
+				}
+
+				const kidsRow = document.createElement("tr");
+				kidsRow.innerHTML = `
+        <td>${serialNumber}</td>
+		<td>number of kids seats - ${parseInt(document.getElementById('cCnt').value)} <a href="#" id="editKidsCount"> Change Count</a></td>
+    `;
+				tableBody.appendChild(kidsRow);
+
+				tableBody.appendChild(kidsRow);
+				document.getElementById('editKidsCount').addEventListener("click", function () {
+					showKidsCountPopup();
+					resetSelectedSeats();
+					enableAllSeats();
+					resetProceedButton();
+					clearSelectedSeatsTable();
+				});
+
+				proceedButton.textContent = `Proceed`;
+
+				proceedButton.disabled = selectedSeatsCount === 0 || selectedSeatsCount > maxSeatsAllowed || selectedSeatsCount <= parseInt(document.getElementById('cCnt').value);
+			}
+			/*added on 01-02-2024*/
+
+			function resetSelectedSeats() {
+				const selectedSeats = document.querySelectorAll(".selected");
+				selectedSeats.forEach((seat) => {
+					seat.classList.remove("selected");
+					const category = getCategory(seat.parentElement.querySelector(".row-label").textContent);
+					toggleCategoryBackgroundColor(seat, category);
+				});
+			}
+
+			// Function to reset disabled seats
+			function enableAllSeats() {
+				const allSeats = document.querySelectorAll(".seat");
+				allSeats.forEach((seat) => {
+					seat.classList.remove("disabled");
+					seat.addEventListener("click", seatClickHandler);
+					seat.style.cursor = "pointer";
+				});
+			}
+
+			// Function to reset the proceed button
+			function resetProceedButton() {
+				const proceedButton = document.getElementById("proceedButton");
+				proceedButton.textContent = "Select your seats to proceed";
+				proceedButton.disabled = true;
+			}
+
+			function clearSelectedSeatsTable() {
+				const tableBody = document.getElementById("selectedSeatsTableBody");
+				const tableHeaderRow = document.getElementById("tableHeaderRow");
+				const proceedButton = document.getElementById("proceedButton");
+
+				tableBody.innerHTML = ""; // Clear existing rows
+				tableHeaderRow.style.display = "none";
+				proceedButton.textContent = "Select your seats to proceed";
+				proceedButton.disabled = true;
+			}
+			/*upto here on 01-02-2024*/
+		});
+	</script>
+</body>
+
+</html>

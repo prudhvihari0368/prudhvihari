@@ -1,0 +1,434 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="assets/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
+    <title>SaVinay Entertainment - Ticket Booking</title>
+    <style>
+      /* CSS styles */
+      body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0px 0px 50px 0px; background-color: #f2f2f2; }
+      .body-wrapper{ padding: 20px;}
+      .banner { text-align: center; margin: 20px 0; }
+      .banner img { max-width: 100%; }
+      h1, h2 { text-align: center; color: #333; }
+      #nextBtn {
+        width: 100%;
+        background-color: #4CAF50;
+        color: #fff;
+        height: 60px;
+        font-size: 18px;
+        max-width: 400px;
+        margin-bottom: 20px;
+      }
+      #nextBtn:disabled {
+        background-color: #ddd;
+        color: #888;
+      }
+      #schedule { margin: 20px auto; background-color: #fff; padding: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+      #schedule ul { list-style: none; padding: 0; }
+      #schedule li { margin-bottom: 10px; }
+      .container { margin: 0 auto; background-color: #fff; padding: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+      .tablediv {width: 50%;max-width: 50%;margin:0 auto;}
+      .note { text-align:left !important; }
+      table { border-collapse: collapse; margin:0 auto;width:100%;}
+      td:nth-child(1) { width: 200px; text-align:center;}
+      td:nth-child(2) { width: 200px; text-align:center;}
+      td:nth-child(3) { width: 200px; text-align:center;}
+      .note strong {font-size: 15px;}
+      
+      th, td { padding: 10px; text-align: center; border-bottom: 1px solid #ddd; }
+      th { background-color: #f2f2f2; }
+      .quantity-input { width: 40px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 4px; }
+      .subtotal { font-weight: bold; }
+      .total-row { background-color: #f2f2f2; }
+      .note-row { padding:0px;  }
+      #blockB { margin: 20px auto; background-color: #fff; padding: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+      /* Match text field styles to dropdowns and buttons */
+      input[type="number"],  select { font-family: 'Poppins', sans-serif; font-size: 14px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; color: #333; box-sizing: border-box; }
+      input::-webkit-outer-spin-button,  input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0;}
+      input[type=number] { -moz-appearance: textfield; }
+      button { font-family: 'Poppins', sans-serif; font-size: 14px; padding: 6px 12px; border: none; border-radius: 4px; background-color: #333; color: #fff; cursor: pointer; }
+      button:hover { background-color: #555; }
+      /* Responsive styles */
+      @media (max-width: 768px) {
+      .tablediv { width: 100%; max-width: 100%; margin: 0 auto;}
+      table { width: 100%; max-width: 100%;}
+      td:nth-child(1) { width: 100%;}
+      td:nth-child(2) { width: 100%;}
+      td:nth-child(3) { width: 100%;}
+      .table-responsive table thead{ display: none;}
+      .table-responsive table tr{ display: block; border: 1px solid #ccc; margin: 0 0 12px; border-radius: 5px; padding: 15px;}
+      .table-responsive table td{ display: flex; justify-content: space-between; align-items: center; padding: 5px 0;}
+      .table-responsive table td:before{ content: attr(data-label); font-size: 0.9em; text-align: left; font-weight: bold; text-transform: uppercase; max-width: 45%; color: #545454; margin-right:15px;}
+      .table-responsive table tr.total-row{ display: flex; justify-content: space-between;}
+      .table-responsive table tr.total-row td{ display: block; border: none;}
+      .table-responsive table tr.note-row{ display: flex; justify-content: space-between;}
+      .table-responsive table tr.note-row td{ display: block; border: none;}
+      .table-responsive table tr.note-row td:before {margin-right:0px;}
+      }
+      
+      h1 {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+    
+        form {
+          max-width: 400px;
+          margin: 20px auto;
+        }
+    
+        label {
+          display: block;
+          margin-bottom: 10px;
+        }
+    
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"]{
+          width: 100%;
+          padding: 10px;
+          font-size: 16px;
+          margin-bottom: 10px;
+          box-sizing: border-box;
+        }
+        
+        #btnContainer
+        {
+            text-align: center;
+        }
+    
+      .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #f0f0f0; /* Customize the background color of the footer */
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .footer img {
+            height: 20px; /* Adjust the height of the logo as needed */
+            margin-right: 5px; /* Add some spacing between the text and the logo */
+            margin-left: 5px;
+        }
+    
+        .footer span {
+            font-size: 14px; /* Adjust the font size of the "Powered by" text as needed */
+        }
+
+
+        /* Add CSS styles for the loader */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+    
+        .loader-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+        }
+    
+        .loader-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 10px;
+        }
+    
+        .loader-text {
+            font-size: 16px;
+        }
+    
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&display=swap">
+</head>
+<body>
+  <section class="body-wrapper">
+      <div class="banner">
+        <img src="assets/savinay_poster.png" width="300px" alt="Event Banner">
+      </div>
+    
+      <!--<h1>Event Registration</h1>-->
+    
+      <!--<div id="schedule">-->
+      <!--  <h2>Schedule</h2>-->
+      <!--  <ul>-->
+      <!--    <li>Coming Soon</li>-->
+      <!--  </ul>-->
+      <!--</div>-->
+    
+      <div class="container">
+        <h2>Provide your details for booking seats</h2>
+
+          <form id="userForm">
+            <label for="username">Name(Firstname Lastname):</label>
+            <input type="text" id="username" name="name" placeholder="Firstname Lastname" required>
+        
+            <label for="useremail">Email(You will receive tickets in this email):</label>
+            <input type="email" id="useremail" name="email" required>
+            <p id="eligible_complimentary" style="color:#00CC00;margin-top: 0;display:none;">Eligible for Special Discount - from Punha Sahi Re Sahi Ticket Purchase(Discount applied at checkout)</p>
+        
+            <label for="usermobile">Mobile:</label>
+            <input type="tel" id="usermobile" name="mobile" maxlength="10" required>
+          </form>
+          <div id="errorMessage"></div>
+          <div id="btnContainer">
+              <button id="nextBtn" disabled>Next</button>
+          </div>
+          <div class="table-responsive tablediv" id="ticket_selection">
+                        <table>
+              <thead>
+                <tr>
+                  <th scope="col">Seat Type</th>
+                  <th scope="col">Price</th>
+                  <!--<th scope="col">Available Seats</th>-->
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Seat Type">Bronze</td>
+                  <td data-label="Price">$50</td>
+                  <!--<td data-label="Available Seats" style="color:green;font-weight: bold;">196</td>-->
+                </tr>
+                <tr>
+                  <td data-label="Seat Type">Gold</td>
+                  <td data-label="Price">$65</td>
+                  <!--<td data-label="Available Seats" style="color:orange;font-weight: bold;">17</td>-->
+                </tr>
+                <tr>
+                  <td data-label="Seat Type">Platinum</td>
+                  <td data-label="Price">$79</td>
+                  <!--<td data-label="Available Seats" style="color:red;font-weight: bold;">6</td>-->
+                </tr>
+                <tr>
+                  <td data-label="Seat Type">Diamond</td>
+                  <td data-label="Price">$89</td>
+                  <!--<td data-label="Available Seats" style="color:red;font-weight: bold;">10</td>-->
+                </tr>
+                <tr class="note-row">
+                  <td colspan="3" class="note"><strong>Note: Kids get seats at flat $25 in Platinum / Gold / Bronze.</strong></td>
+                </tr>
+                <tr class="note-row">
+                  <td colspan="3" class="note">A small transaction & handling fees will be added to your ticket cost.</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+      
+      <!--<div style="text-align:center;">I accept the <a href="https://klubgdc.com.au/cikka-sangam-diwali-mela-ticket-booking-platform-terms-conditions/">terms & conditions</a>.</div>-->
+    
+      <!--<div id="blockB">-->
+      <!--  <h2>Block B</h2>-->
+      <!--  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu sapien consectetur, blandit tellus eu, ullamcorper urna.</p>-->
+      <!--</div>-->
+      <div class="footer">
+        <span>Powered by</span>
+        <a href="https://klubgdc.com.au/privacy/"><img src="https://klubgdc.com.au/wp-content/uploads/2023/03/klubgdc_logo_black.svg" alt="Logo"></a> 
+      </div>
+      
+      <!-- Loader HTML -->
+      <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>Loading the seat layout. Please wait...</p>
+        </div>
+      </div>
+    
+    </section>
+      <script>
+      
+        // Function to show the loader
+        function showLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+        }
+    
+        // Function to hide the loader
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'none';
+        }
+    
+        // Attach a click event handler to the Next button (or any other action trigger)
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            // Show the loader when the action is triggered
+            showLoader();
+    
+            // Simulate an asynchronous action (replace it with your actual code)
+            // setTimeout(function() {
+            //     // Hide the loader when the action is completed
+            //     hideLoader();
+                
+            //     // Perform other actions after the loader is hidden
+            // }, 2000); // Replace 2000 with the actual delay time
+        });
+        
+        
+        document.getElementById('usermobile').addEventListener('input', function (event) {
+            var inputField = event.target;
+            var inputValue = inputField.value;
+        
+            // Remove any characters that are not numbers
+            var sanitizedValue = inputValue.replace(/[^0-9]/g, '');
+        
+            // Update the input field with the sanitized value
+            inputField.value = sanitizedValue;
+        });
+        
+        document.getElementById('useremail').addEventListener('blur', function () {
+            var emailField = this; // "this" refers to the input field
+            var email = emailField.value;
+            var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        
+            if (!emailPattern.test(email)) {
+                // Set the border color to red for invalid email
+                emailField.style.borderColor = 'red';
+            } else {
+                // Reset the border color to its default for valid email
+                emailField.style.borderColor = ''; // Empty string resets to default
+            }
+        });
+
+
+        function isValidEmail(email) {
+            // Regular expression for email validation
+            var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            return emailPattern.test(email);
+        }
+
+        function updateTotals() {
+          const userName = document.getElementById('username');
+          const userEmail = document.getElementById('useremail');
+          const userMobile = document.getElementById('usermobile');
+          
+          const userNameValue = userName.value;
+          const userEmailValue = userEmail.value;
+          const userMobileValue = userMobile.value;
+          
+          const nextBtn = document.getElementById('nextBtn');
+        //   if (total == 0 || userNameValue == '' || userEmailValue == '' || userMobileValue == '' || userTandCCheckValue == false)
+        //   {
+          if (userNameValue == '' || userEmailValue == '' || userMobileValue == '' || !isValidEmail(userEmailValue))
+          {
+              if(!isValidEmail(userEmailValue)){
+                  document.getElementById('useremail').style.borderColor = 'red';
+                  nextBtn.disabled = true;
+              }
+          }
+          else
+          {
+              document.getElementById('useremail').style.borderColor = '';
+              nextBtn.disabled = false;
+              
+              if (userMobileValue.length == 10)
+              {
+                  document.getElementById('usermobile').style.borderColor = '';
+                  nextBtn.disabled = false;
+              }
+              else
+              {
+                  document.getElementById('usermobile').style.borderColor = 'red';
+                  nextBtn.disabled = true;
+              }
+          }
+          
+        }
+        
+        // Event listener for price selection
+        document.getElementById('username').addEventListener('input', function() {
+
+          updateTotals();
+        });
+        
+        document.getElementById('useremail').addEventListener('change', function() {
+          updateTotals();
+          checkFreeTicketsForMember(document.getElementById('useremail').value);
+        });
+        
+        document.getElementById('usermobile').addEventListener('input', function() {
+
+          updateTotals();
+        });
+        
+        
+        document.getElementById('nextBtn').addEventListener('click', function(){
+            path = "https://www.klubgdc.com.au/savinay/select_seat.php?tid=6369&name="+encodeURI(document.getElementById('username').value)+"&email="+encodeURI(document.getElementById('useremail').value)+"&mobile="+encodeURI(document.getElementById('usermobile').value);
+            
+            console.log(path);
+            window.location.href = path;
+        });
+        
+        function checkFreeTicketsForMember(userEmail) {
+            // Make a POST request to your API endpoint
+            fetch('https://www.klubgdc.com.au/savinay/check_member_email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Adjust the content type if needed
+                },
+                body: JSON.stringify({
+                    email: userEmail,
+                }),
+            })
+            .then(response => {
+                // Check if the response status is OK (200)
+                if (response.status === 200) {
+                    // Parse the JSON response
+                    return response.json();
+                } else {
+                    console.error('Error:', response.status);
+                    throw new Error('Response status is not OK');
+                }
+            })
+            .then(data => {
+                // Print the parsed JSON response
+                console.log("email:", data.email);
+                console.log("discounted_ticket_type:", data.discounted_ticket_type);
+                console.log("discounted_ticket_limit:", data.discounted_ticket_limit);
+                console.log("discounted_ticket_used:", data.discounted_ticket_used);
+                var available_complimentary_tickets = data.discounted_ticket_limit - data.discounted_ticket_used;
+                if(available_complimentary_tickets)
+                {
+                    document.getElementById('eligible_complimentary').style.display = 'table-row';
+                }
+                else{
+                    document.getElementById('eligible_complimentary').style.display = 'none';
+                }
+    
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+      </script>
+    </body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Example</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px;
+            margin: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Table Example</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <p>diamond</p>
+                    <p>platinum</p>
+                    <p>gold</p>
+                    <p>bronze</p>
+                </td>
+                <td>
+                    <p id="diamond-amount"></p>
+                    <p id="platinum-amount"></p>
+                    <p id="gold-amount"></p>
+                    <p id="bronze-amount"></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Discount - Early bird
+                </td>
+                <td id="early-bird-discount"></td>
+            </tr>
+            <tr>
+                <td>
+                    Discount - Returning customer
+                </td>
+                <td id="returning-customer-discount"></td>
+            </tr>
+            <tr>
+                <td>
+                    Children discount rate
+                </td>
+                <td id="children-discount"></td>
+            </tr>
+            <tr>
+                <td>
+                    Total
+                </td>
+                <td id="total-amount"></td>
+            </tr>
+        </tbody>
+    </table><br>
+    <button type="submit" id="proceedButton">Pay >> </button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to update amounts based on selected seats
+            function updateAmounts(selectedSeatsData) {
+                const seatValue = 50; // Replace with the actual value of one seat
+
+                const urlParams = new URLSearchParams(window.location.search);
+
+                // Example: Get the 'bCnt' parameter
+                const bronzeCount = urlParams.get('bCnt');
+                console.log("Bronze Count:", bronzeCount);
+
+                // Example: Get the 'gCnt' parameter
+                const goldCount = urlParams.get('gCnt');
+                console.log("Gold Count:", goldCount);
+
+                // Example: Get the 'pCnt' parameter
+                const platinumCount = urlParams.get('pCnt');
+                console.log("Platinum Count:", platinumCount);
+
+                // Example: Get the 'dCnt' parameter
+                const diamondCount = urlParams.get('dCnt');
+                console.log("Diamond Count:", diamondCount);
+
+                // Example: Get the 'fData' parameter
+                const formattedData = urlParams.get('fData');
+                console.log("Formatted Data:", formattedData);
+
+
+                const diamondAmount = selectedSeatsData['Diamond'] ? diamondCount * 89 : 0;
+                const platinumAmount = selectedSeatsData['Platinum'] ? platinumCount * 79 : 0;
+                const goldAmount = selectedSeatsData['Gold'] ? goldCount * 65 : 0;
+                const bronzeAmount = selectedSeatsData['Bronze'] ? bronzeCount * 50 : 0;
+
+                // const earlyBirdDiscount = (diamondAmount + platinumAmount + goldAmount + bronzeAmount) * 0.05;
+                const returningCustomerDiscount = (diamondAmount + platinumAmount + goldAmount + bronzeAmount) * 0.15;
+                const childrenDiscount = 2 * 25; // Replace with the actual number of children
+
+                const totalAmount = diamondAmount + platinumAmount + goldAmount + bronzeAmount 
+                
+                
+                // -
+                //     earlyBirdDiscount - returningCustomerDiscount - childrenDiscount;
+
+                // Update the HTML elements with calculated values
+                document.getElementById('diamond-amount').textContent = selectedSeatsData['Diamond'] ? `${diamondCount} * $89 = $${diamondAmount}` : '';
+                document.getElementById('platinum-amount').textContent = selectedSeatsData['Platinum'] ? `${platinumCount} * $79 = $${platinumAmount}` : '';
+                document.getElementById('gold-amount').textContent = selectedSeatsData['Gold'] ? `${goldCount} * $65 = $${goldAmount}` : '';
+                document.getElementById('bronze-amount').textContent = selectedSeatsData['Bronze'] ? `${bronzeCount} * $50 = $${bronzeAmount}` : '';
+                // document.getElementById('early-bird-discount').textContent = `5% = -$${earlyBirdDiscount.toFixed(2)}`;
+                // document.getElementById('returning-customer-discount').textContent = `15% = -$${returningCustomerDiscount.toFixed(2)}`;
+                // document.getElementById('children-discount').textContent = ` * $25 = $${childrenDiscount}`;
+                document.getElementById('total-amount').textContent = `$${totalAmount.toFixed(2)}`;
+            }
+
+            // Function to fetch selected seats from another webpage (trail.html)
+            function fetchSelectedSeats() {
+                // Replace this with your actual logic to fetch selected seats from trail.html
+                const selectedSeatsData = {
+                    'Diamond': [],
+                    'Platinum': [],
+                    'Gold': [],
+                    'Bronze': [],
+                };
+
+                updateAmounts(selectedSeatsData);
+            }
+
+            // Call the function to fetch selected seats and update the amounts when the page is loaded
+            fetchSelectedSeats();
+
+            // Event listener for the 'Proceed' button
+            document.getElementById('proceedButton').addEventListener('click', function () {
+                // Call the function to fetch selected seats and update the amounts
+                fetchSelectedSeats();
+            });
+        });
+    </script>
+</body>
+
+</html>
